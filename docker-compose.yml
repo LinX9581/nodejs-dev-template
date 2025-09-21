@@ -1,0 +1,18 @@
+name: nodejs-template
+services:
+  # Node.js 應用程式服務
+  app:
+    build: .
+    image: nodejs-template:v1.0.0
+    container_name: nodejs-template-app
+    restart: always
+    ports:
+      - "3009:3009"
+    environment:
+      - TZ=Asia/Taipei
+      - NODE_ENV=production
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    env_file:
+      - .env
