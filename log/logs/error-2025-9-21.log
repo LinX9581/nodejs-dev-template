@@ -1,0 +1,13 @@
+[2025/09/21 21:29:00] ERROR - GET / - IP: 35.189.174.174 - Error: res.render is not a function
+Stack: TypeError: res.render is not a function
+    at file:///devops/github/nodejs-template1/route/indexRouter.js:17:7
+    at file:///devops/github/nodejs-template1/log/asyncHandler.js:11:21
+    at Layer.handle [as handle_request] (/devops/github/nodejs-template1/node_modules/express/lib/router/layer.js:95:5)
+    at next (/devops/github/nodejs-template1/node_modules/express/lib/router/route.js:149:13)
+    at file:///devops/github/nodejs-template1/log/userAccess.js:61:5
+    at Layer.handle [as handle_request] (/devops/github/nodejs-template1/node_modules/express/lib/router/layer.js:95:5)
+    at next (/devops/github/nodejs-template1/node_modules/express/lib/router/route.js:149:13)
+    at Route.dispatch (/devops/github/nodejs-template1/node_modules/express/lib/router/route.js:119:3)
+    at Layer.handle [as handle_request] (/devops/github/nodejs-template1/node_modules/express/lib/router/layer.js:95:5)
+    at /devops/github/nodejs-template1/node_modules/express/lib/router/index.js:284:15
+

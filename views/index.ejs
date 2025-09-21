@@ -1,446 +1,336 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%- title.replace(/</g, '&lt;').replace(/>/g, '&gt;') %> <%= version %> - DevOps Dashboard</title>
+    <title><%- title.replace(/</g, '&lt;').replace(/>/g, '&gt;') %> <%= version %></title>
     
     <!-- Bootstrap 5 CSS -->
-    <link href="./css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="./css/bootstrap-icons.css">
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
     
     <!-- DataTables Bootstrap 5 CSS -->
     <link rel="stylesheet" href="./css/datatables.bootstrap5.min.css">
     
-    <!-- JetBrains Mono Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- 自訂樣式 -->
+    <!-- 自訂 CSS -->
     <link rel="stylesheet" href="./css/style.css">
 </head>
 
-<body>
+<body class="bg-light">
     <div class="container-fluid py-4">
-        <div class="main-container p-4">
-            <!-- Header -->
-            <div class="row">
-                <div class="col-12">
-                    <h1 class="glow-effect mb-4">
-                        <i class="bi bi-terminal"></i>
+        <div class="container">
+            <!-- 主標題 -->
+            <div class="row mb-5">
+                <div class="col-12 text-center">
+                    <h1 class="display-4 fw-light text-primary">
                         <%- title.replace(/</g, '&lt;').replace(/>/g, '&gt;') %> <%= version %>
                     </h1>
                 </div>
             </div>
-
-            <!-- Stats Info -->
-            <div class="row">
+            
+            <!-- 第一組數據 - 程式語言使用率 -->
+            <div class="row mb-5">
                 <div class="col-12">
-                    <div class="stats-card">
-                        <div class="row text-center">
-                            <div class="col-md-3">
-                                <h6><i class="bi bi-clock"></i> TIMESTAMP</h6>
-                                <code><%= today %></code>
-                            </div>
-                            <div class="col-md-3">
-                                <h6><i class="bi bi-git"></i> VERSION</h6>
-                                <code>v<%= version %></code>
-                            </div>
-                            <div class="col-md-3">
-                                <h6><i class="bi bi-database"></i> PROJECTS</h6>
-                                <code id="project-count">--loading--</code>
-                            </div>
-                            <div class="col-md-3">
-                                <h6><i class="bi bi-graph-up-arrow"></i> TRENDS</h6>
-                                <code id="trend-count">--loading--</code>
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white text-center">
+                            <h2 class="card-title mb-0 h4">程式語言使用率統計</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-4">
+                                <div class="col-lg-6">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-light">
+                                            <h5 class="card-title mb-0">圖表視覺化</h5>
+                                        </div>
+                                        <div class="card-body d-flex align-items-center justify-content-center">
+                                            <div id="loading1" class="text-muted">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">載入中...</span>
+                                                </div>
+                                                <div class="mt-2">載入中...</div>
+                                            </div>
+                                            <div class="chart-wrapper w-100" style="height: 400px;">
+                                                <canvas id="chart1" style="display: none;"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-lg-6">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-light">
+                                            <h5 class="card-title mb-0">資料表格</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <table id="dataTable1" class="table table-striped table-hover" style="width:100%">
+                                                <thead class="table-dark">
+                                                    <tr>
+                                                        <th>程式語言</th>
+                                                        <th>使用數量</th>
+                                                        <th>市場佔有率</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- 資料將由 JavaScript 動態載入 -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Charts Section -->
-            <div class="row">
-                <!-- GitHub Stars Chart -->
-                <div class="col-xl-6 col-lg-12">
-                    <div class="chart-card" data-title="GITHUB_STARS">
-                        <h3 class="card-title">
-                            <i class="bi bi-star-fill text-warning"></i>
-                            GitHub Stars Analytics
-                        </h3>
-                        
-                        <div id="chart-loading-1" class="loading-spinner">
-                            <div class="spinner-border text-primary" role="status"></div>
+            <!-- 第二組數據 - 開發工具使用率 -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-success text-white text-center">
+                            <h2 class="card-title mb-0 h4">開發工具使用率統計</h2>
                         </div>
-                        
-                        <canvas id="starsChart" style="display: none;"></canvas>
-                    </div>
-                </div>
-
-                <!-- DevOps Trends Chart -->
-                <div class="col-xl-6 col-lg-12">
-                    <div class="chart-card" data-title="DEVOPS_TRENDS">
-                        <h3 class="card-title">
-                            <i class="bi bi-graph-up text-info"></i>
-                            DevOps Trends 2024
-                        </h3>
-                        
-                        <div id="chart-loading-2" class="loading-spinner">
-                            <div class="spinner-border text-info" role="status"></div>
-                        </div>
-                        
-                        <canvas id="trendsChart" style="display: none;"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tables Section -->
-            <div class="row">
-                <!-- GitHub Projects Table -->
-                <div class="col-xl-6 col-lg-12">
-                    <div class="table-card" data-title="PROJECTS_DATA">
-                        <h3 class="card-title">
-                            <i class="bi bi-github text-light"></i>
-                            GitHub Projects Database
-                        </h3>
-                        
-                        <div id="table-loading-1" class="loading-spinner">
-                            <div class="spinner-border text-success" role="status"></div>
-                        </div>
-                        
-                        <div id="table-container-1" style="display: none;">
-                            <table id="projectsTable" class="table table-dark table-striped table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Project</th>
-                                        <th>Stars</th>
-                                        <th>Lang</th>
-                                        <th>Link</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
+                        <div class="card-body">
+                            <div class="row g-4">
+                                <div class="col-lg-6">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-light">
+                                            <h5 class="card-title mb-0">圖表視覺化</h5>
+                                        </div>
+                                        <div class="card-body d-flex align-items-center justify-content-center">
+                                            <div id="loading2" class="text-muted">
+                                                <div class="spinner-border text-success" role="status">
+                                                    <span class="visually-hidden">載入中...</span>
+                                                </div>
+                                                <div class="mt-2">載入中...</div>
+                                            </div>
+                                            <div class="chart-wrapper w-100" style="height: 400px;">
+                                                <canvas id="chart2" style="display: none;"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-lg-6">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-light">
+                                            <h5 class="card-title mb-0">資料表格</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <table id="dataTable2" class="table table-striped table-hover" style="width:100%">
+                                                <thead class="table-dark">
+                                                    <tr>
+                                                        <th>開發工具</th>
+                                                        <th>使用數量</th>
+                                                        <th>市場佔有率</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- 資料將由 JavaScript 動態載入 -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- DevOps Trends Table -->
-                <div class="col-xl-6 col-lg-12">
-                    <div class="table-card" data-title="TRENDS_DATA">
-                        <h3 class="card-title">
-                            <i class="bi bi-bar-chart text-light"></i>
-                            DevOps Trends Database
-                        </h3>
-                        
-                        <div id="table-loading-2" class="loading-spinner">
-                            <div class="spinner-border text-warning" role="status"></div>
-                        </div>
-                        
-                        <div id="table-container-2" style="display: none;">
-                            <table id="trendsTable" class="table table-dark table-striped table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Category</th>
-                                        <th>Growth</th>
-                                        <th>Adoption</th>
-                                        <th>Trend</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Error Alert -->
-            <div id="error-alert" class="alert alert-danger d-none" role="alert">
-                <i class="bi bi-exclamation-triangle-fill"></i>
-                <strong>ERROR:</strong> <span id="error-message"></span>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript Libraries -->
-    <script src="./js/bootstrap.bundle.min.js"></script>
+    <!-- 引用本地 JavaScript 檔案 -->
     <script src="./js/jquery.min.js"></script>
-    <script src="./js/chart.umd.min.js"></script>
+    <script src="./js/bootstrap.bundle.min.js"></script>
     <script src="./js/datatables.min.js"></script>
     <script src="./js/datatables.bootstrap5.min.js"></script>
-
+    <script src="./js/chart.umd.min.js"></script>
+    
     <script>
-        // 🎨 工程師風格配色
-        const chartColors = {
-            github: ['#f85149', '#ff7b72', '#ffa198', '#ffbdbe', '#ffc1cc'],
-            trends: ['#7c3aed', '#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe'],
-            success: '#238636',
-            warning: '#d29922',
-            info: '#58a6ff',
-            danger: '#f85149'
-        };
-
-        let starsChart = null;
-        let trendsChart = null;
-        let projectsTable = null;
-        let trendsTable = null;
-
-        // 📡 獲取 GitHub 專案資料
-        const fetchProjects = async () => {
-            const response = await fetch('/api/devops-projects', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            });
+        // 雙數據圖表和資料表管理
+        class DualChartTable {
+            constructor() {
+                this.chart1 = null;
+                this.chart2 = null;
+                this.dataTable1 = null;
+                this.dataTable2 = null;
+                this.data1 = [];
+                this.data2 = [];
+            }
             
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const { status, data, message } = await response.json();
-            if (status !== 'success') throw new Error(message);
-            return data;
-        };
-
-        // 📊 獲取 DevOps 趨勢資料
-        const fetchTrends = async () => {
-            const response = await fetch('/api/devops-trends', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            });
-            
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const { status, data, message } = await response.json();
-            if (status !== 'success') throw new Error(message);
-            return data;
-        };
-
-        // 📊 初始化 GitHub Stars 圖表
-        const initStarsChart = (projects) => {
-            const sortedProjects = [...projects].sort((a, b) => b.stars - a.stars).slice(0, 8);
-            const ctx = $('#starsChart')[0].getContext('2d');
-            
-            starsChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: sortedProjects.map(p => p.name),
-                    datasets: [{
-                        label: '⭐ GitHub Stars',
-                        data: sortedProjects.map(p => p.stars),
-                        backgroundColor: chartColors.github,
-                        borderColor: '#f85149',
-                        borderWidth: 1,
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        title: { display: false },
-                        legend: { display: false }
+            // 建立圖表
+            createChart = (chartId, type, data, colors) => {
+                const ctx = $(`#${chartId}`)[0].getContext('2d');
+                
+                // 銷毀現有圖表
+                if (chartId === 'chart1' && this.chart1) {
+                    this.chart1.destroy();
+                } else if (chartId === 'chart2' && this.chart2) {
+                    this.chart2.destroy();
+                }
+                
+                const chartInstance = new Chart(ctx, {
+                    type: type,
+                    data: {
+                        labels: data.map(item => item.label),
+                        datasets: [{
+                            label: '數值',
+                            data: data.map(item => item.value),
+                            backgroundColor: type === 'bar' 
+                                ? colors.slice(0, data.length)
+                                : colors[0] + '33',
+                            borderColor: type === 'bar' 
+                                ? colors.slice(0, data.length)
+                                : colors[0],
+                            borderWidth: 2,
+                            fill: type === 'line' ? false : true,
+                            tension: type === 'line' ? 0.4 : 0
+                        }]
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { 
-                                color: '#7d8590',
-                                font: { family: 'JetBrains Mono' },
-                                callback: value => value.toLocaleString()
-                            },
-                            grid: { color: '#30363d' }
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
                         },
-                        x: {
-                            ticks: { 
-                                color: '#7d8590',
-                                font: { family: 'JetBrains Mono' }
-                            },
-                            grid: { display: false }
+                        scales: {
+                            y: { beginAtZero: true }
                         }
                     }
-                }
-            });
-        };
-
-        // 📈 初始化 DevOps Trends 圖表
-        const initTrendsChart = (trends) => {
-            const ctx = $('#trendsChart')[0].getContext('2d');
-            
-            trendsChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: trends.map(t => t.category),
-                    datasets: [{
-                        label: '📈 Growth %',
-                        data: trends.map(t => t.growth_percentage),
-                        backgroundColor: chartColors.trends,
-                        borderColor: '#30363d',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                            labels: {
-                                color: '#c9d1d9',
-                                font: { family: 'JetBrains Mono', size: 10 }
-                            }
-                        }
-                    }
-                }
-            });
-        };
-
-        // 📋 初始化專案表格
-        const initProjectsTable = (projects) => {
-            const tableData = projects.map(project => [
-                `<strong>${project.name}</strong>`,
-                `<span class="stars-count">${project.stars.toLocaleString()}</span>`,
-                `<span class="language-badge" style="background-color: ${getLanguageColor(project.language)}">${project.language}</span>`,
-                `<a href="${project.url}" target="_blank" class="project-link">
-                    <i class="bi bi-box-arrow-up-right"></i>
-                </a>`
-            ]);
-
-            projectsTable = $('#projectsTable').DataTable({
-                data: tableData,
-                order: [[1, 'desc']],
-                pageLength: 8,
-                searching: false,
-                info: false,
-                lengthChange: false,
-                language: { paginate: { previous: "‹", next: "›" } }
-            });
-        };
-
-        // 📊 初始化趨勢表格
-        const initTrendsTable = (trends) => {
-            const tableData = trends.map(trend => [
-                `<strong>${trend.category}</strong>`,
-                `<span class="growth-percentage">+${trend.growth_percentage}%</span>`,
-                `${trend.adoption_rate}%`,
-                `<span class="trend-indicator trend-${trend.trend}">${trend.trend.toUpperCase()}</span>`
-            ]);
-
-            trendsTable = $('#trendsTable').DataTable({
-                data: tableData,
-                order: [[1, 'desc']],
-                pageLength: 8,
-                searching: false,
-                info: false,
-                lengthChange: false,
-                language: { paginate: { previous: "‹", next: "›" } }
-            });
-        };
-
-        // 🎨 程式語言顏色
-        const getLanguageColor = (language) => {
-            const colors = {
-                'Go': '#00ADD8',
-                'Python': '#3776AB',
-                'TypeScript': '#3178C6',
-                'Java': '#ED8B00',
-                'JavaScript': '#F7DF1E'
-            };
-            return colors[language] || '#6c757d';
-        };
-
-        // 👁️ UI 控制
-        const hideLoading = (type) => {
-            if (type === 'charts') {
-                $('#chart-loading-1, #chart-loading-2').fadeOut(300);
-                $('#starsChart, #trendsChart').fadeIn(500);
-            } else if (type === 'tables') {
-                $('#table-loading-1, #table-loading-2').fadeOut(300);
-                $('#table-container-1, #table-container-2').fadeIn(500);
-            }
-        };
-
-        const showError = (message) => {
-            $('.loading-spinner').hide();
-            $('#error-message').text(message);
-            $('#error-alert').removeClass('d-none');
-        };
-
-        const updateCounts = (projects, trends) => {
-            $('#project-count').text(`${projects.length} repos`);
-            $('#trend-count').text(`${trends.length} categories`);
-        };
-
-        // 🧹 清理資源
-        const cleanup = () => {
-            starsChart?.destroy();
-            trendsChart?.destroy();
-            projectsTable?.destroy();
-            trendsTable?.destroy();
-        };
-
-        // 🔍 等待 Chart.js 載入
-        const waitForChart = () => {
-            return new Promise((resolve) => {
-                if (typeof Chart !== 'undefined') {
-                    resolve();
+                });
+                
+                // 儲存圖表實例
+                if (chartId === 'chart1') {
+                    this.chart1 = chartInstance;
                 } else {
-                    setTimeout(() => waitForChart().then(resolve), 100);
+                    this.chart2 = chartInstance;
                 }
-            });
-        };
-
-        // 🚀 主應用程式初始化
-        const initApp = async () => {
-            try {
-                // 並行獲取資料
-                const [projects, trends] = await Promise.all([
-                    fetchProjects(),
-                    fetchTrends()
-                ]);
-                
-                // 更新計數器
-                updateCounts(projects, trends);
-                
-                // 初始化圖表
-                await Promise.all([
-                    new Promise(resolve => { initStarsChart(projects); resolve(); }),
-                    new Promise(resolve => { initTrendsChart(trends); resolve(); })
-                ]);
-                
-                // 初始化表格
-                await Promise.all([
-                    new Promise(resolve => { initProjectsTable(projects); resolve(); }),
-                    new Promise(resolve => { initTrendsTable(trends); resolve(); })
-                ]);
-                
-                // 隱藏載入畫面
-                setTimeout(() => {
-                    hideLoading('charts');
-                    hideLoading('tables');
-                }, 800);
-                
-            } catch (error) {
-                console.error('Init failed:', error);
-                showError(`System Error: ${error.message}`);
-            }
-        };
-
-        // 🎬 應用程式啟動
-        $(document).ready(async () => {
-            try {
-                await waitForChart();
-                console.log('📡 Chart.js loaded successfully');
-                await initApp();
-            } catch (error) {
-                showError(`Boot Error: ${error.message}`);
             }
             
-            $(window).on('beforeunload', cleanup);
+            // 初始化 DataTable
+            initDataTable = (tableId, data, columns) => {
+                // 銷毀現有的 DataTable
+                if (tableId === 'dataTable1' && this.dataTable1) {
+                    this.dataTable1.destroy();
+                    $(`#${tableId} tbody`).empty();
+                } else if (tableId === 'dataTable2' && this.dataTable2) {
+                    this.dataTable2.destroy();
+                    $(`#${tableId} tbody`).empty();
+                }
+                
+                const tableData = data.map(item => [
+                    item.label,
+                    item.value.toLocaleString(),
+                    `${item.percentage}%`
+                ]);
+                
+                const tableInstance = $(`#${tableId}`).DataTable({
+                    data: tableData,
+                    columns: columns,
+                    pageLength: 6,
+                    lengthMenu: [[5, 6, 10, -1], [5, 6, 10, "全部"]],
+                    searching: true,
+                    ordering: true,
+                    info: true,
+                    language: {
+                        search: "搜尋:",
+                        lengthMenu: "顯示 _MENU_ 筆資料",
+                        info: "顯示第 _START_ 到 _END_ 筆資料，共 _TOTAL_ 筆",
+                        paginate: {
+                            first: "首頁",
+                            last: "末頁", 
+                            next: "下一頁",
+                            previous: "上一頁"
+                        }
+                    },
+                    order: [[1, 'desc']]
+                });
+                
+                // 儲存 DataTable 實例
+                if (tableId === 'dataTable1') {
+                    this.dataTable1 = tableInstance;
+                } else {
+                    this.dataTable2 = tableInstance;
+                }
+            }
             
-            window.addEventListener('error', (event) => {
-                console.error('💥 Runtime Error:', event.error);
-                showError('Runtime exception detected. Please refresh.');
-            });
+            // 載入第一組資料
+            loadData1 = async () => {
+                try {
+                    const response = await fetch('/api/chart-data', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.status === 'success') {
+                            this.data1 = result.data;
+                            
+                            $('#loading1').fadeOut(300, () => {
+                                $('#chart1').fadeIn(500);
+                            });
+                            
+                            const colors1 = ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#e67e22'];
+                            this.createChart('chart1', 'line', this.data1, colors1);
+                            
+                            const columns1 = [
+                                { title: "程式語言" },
+                                { title: "使用數量" },
+                                { title: "市場佔有率" }
+                            ];
+                            this.initDataTable('dataTable1', this.data1, columns1);
+                        }
+                    }
+                } catch (error) {
+                    console.error('程式語言資料載入失敗:', error);
+                }
+            }
+            
+            // 載入第二組資料
+            loadData2 = async () => {
+                try {
+                    const response = await fetch('/api/tools-data', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.status === 'success') {
+                            this.data2 = result.data;
+                            
+                            $('#loading2').fadeOut(300, () => {
+                                $('#chart2').fadeIn(500);
+                            });
+                            
+                            const colors2 = ['#8e44ad', '#27ae60', '#e67e22', '#34495e', '#f39c12', '#95a5a6'];
+                            this.createChart('chart2', 'bar', this.data2, colors2);
+                            
+                            const columns2 = [
+                                { title: "開發工具" },
+                                { title: "使用數量" },
+                                { title: "市場佔有率" }
+                            ];
+                            this.initDataTable('dataTable2', this.data2, columns2);
+                        }
+                    }
+                } catch (error) {
+                    console.error('開發工具資料載入失敗:', error);
+                }
+            }
+            
+        }
+        
+        // 初始化
+        $(() => {
+            const app = new DualChartTable();
+            
+            // 載入兩組資料
+            app.loadData1();
+            app.loadData2();
+            
         });
     </script>
 </body>
-
-</html>
 </html>
