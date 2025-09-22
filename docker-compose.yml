@@ -3,7 +3,7 @@ services:
   # Node.js 應用程式服務
   app:
     build: .
-    image: nodejs-template:v1.0.0
+    image: nodejs-template:v1.0.1
     container_name: nodejs-template-app
     restart: always
     ports:

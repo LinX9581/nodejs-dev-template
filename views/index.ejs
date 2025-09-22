@@ -147,6 +147,30 @@
     <script src="./js/chart.umd.min.js"></script>
     
     <script>
+    /* 主程式架構
+    class DualChartTable {
+        // 1. 建構函數 - 初始化所有變數
+        constructor() { ... }
+        
+        // 2. 圖表建立方法
+        createChart = (chartId, type, data, colors) => { ... }
+        
+        // 3. 資料表初始化方法  
+        initDataTable = (tableId, data, columns) => { ... }
+        
+        // 4. 資料載入方法
+        loadData1 = async () => { ... }  // 第一組資料
+        loadData2 = async () => { ... }  // 第二組資料
+    }
+
+    // 5. 應用程式初始化
+    $(() => {
+        const app = new DualChartTable();
+        app.loadData1();
+        app.loadData2();
+    });
+    */
+
         // 雙數據圖表和資料表管理
         class DualChartTable {
             constructor() {
@@ -272,7 +296,7 @@
                             });
                             
                             const colors1 = ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#e67e22'];
-                            this.createChart('chart1', 'line', this.data1, colors1);
+                            this.createChart('chart1', 'bar', this.data1, colors1);
                             
                             const columns1 = [
                                 { title: "程式語言" },
@@ -305,7 +329,7 @@
                             });
                             
                             const colors2 = ['#8e44ad', '#27ae60', '#e67e22', '#34495e', '#f39c12', '#95a5a6'];
-                            this.createChart('chart2', 'bar', this.data2, colors2);
+                            this.createChart('chart2', 'line', this.data2, colors2);
                             
                             const columns2 = [
                                 { title: "開發工具" },
