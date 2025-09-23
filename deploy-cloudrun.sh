@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -Eeuo pipefail
 # GCP_PROJECT_NAME={GCP_PROJECT_NAME}
 # APP_VERSION=1.8
 AR_PROJECT_NAME=nodejs-dev-template
