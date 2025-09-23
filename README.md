@@ -33,3 +33,12 @@ docker compose down
 # uncomment a variable
 sh deploy-cloudrun.sh
 ```
+
+### CI
+專案本身要建立環境變數 nodejs-dev-template-env  
+裡面有兩個 secret  
+GCP_PROJECT  
+PUSH_STATUS_WEBHOOK_URL  
+  
+是自建 Runner
+所以 Runner 本身要有 GAR 和 Cloud Run 寫入權限  
