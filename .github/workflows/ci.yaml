@@ -40,10 +40,9 @@ jobs:
 
     - name: Verify gcloud authentication
       run: |
-        echo "Current gcloud account:"
-        gcloud auth list
-        echo "Current gcloud project:"
-        gcloud config get-value project
+        echo "Verifying gcloud authentication..."
+        gcloud auth list --format="value(account)" | head -1 | sed 's/.*@/***@/'
+        echo "Project configured successfully"
 
     - name: Deploy to Cloud Run
       run: sh ./deploy-cloudrun.sh
