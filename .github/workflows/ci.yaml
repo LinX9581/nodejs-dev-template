@@ -1,0 +1,83 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+env:
+  PROJECT_NAME: nodejs-dev-template
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    environment: nodejs-dev-template-env
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js v22
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run tests
+      run: npm test
+
+    - name: Get package version
+      id: package-version
+      run: |
+        VERSION=$(node -p "require('./package.json').version")
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Package version: $VERSION"
+
+    - name: Verify gcloud authentication
+      run: |
+        echo "Current gcloud account:"
+        gcloud auth list
+        echo "Current gcloud project:"
+        gcloud config get-value project
+
+    - name: Deploy to Cloud Run
+      run: sh ./deploy-cloudrun.sh
+      env:
+        GCP_PROJECT_NAME: ${{ secrets.GCP_PROJECT }}
+        APP_VERSION: ${{ steps.package-version.outputs.version }}
+        AR_TARGET: asia-docker.pkg.dev
+
+    - name: Notify API of success
+      if: success()
+      run: |
+        curl -X POST ${{ secrets.PUSH_STATUS_WEBHOOK_URL }} \
+          -H "Content-Type: application/json" \
+          -d '{
+            "project": "${{ env.PROJECT_NAME }}",
+            "status": "success",
+            "version": "${{ steps.package-version.outputs.version }}",
+            "message": "Deployment successful",
+            "commit": "${{ github.sha }}",
+            "branch": "${{ github.ref_name }}",
+            "timestamp": "'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'"
+          }'
+
+    - name: Notify API of failure
+      if: failure()
+      run: |
+        curl -X POST ${{ secrets.PUSH_STATUS_WEBHOOK_URL }} \
+          -H "Content-Type: application/json" \
+          -d '{
+            "project": "${{ env.PROJECT_NAME }}",
+            "status": "failure",
+            "version": "${{ steps.package-version.outputs.version }}",
+            "message": "Deployment failed",
+            "commit": "${{ github.sha }}",
+            "branch": "${{ github.ref_name }}",
+            "timestamp": "'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'"
+          }'

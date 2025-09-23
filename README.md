@@ -11,7 +11,7 @@ Express,EJS,Mysql,Docker,Cloudrun,GithubCI/CD,ChartJS,Datatable,Bootstrap5
 
 ### Deploy
 
-1. Local test：
+1. Local test  
 ```
 cp .env.example .env
 npm install
@@ -19,11 +19,17 @@ npm run dev
 http://localhost:3009
 ```
 
-2. Docker Compose 部署
+2. Docker Compose  
 ```
 # .env control image tag
 cp .env.example .env
 docker-compose up -d
 docker logs -f nodejs-template-app
 docker compose down
+```
+
+3. Cloud Run  
+```
+# uncomment a variable
+sh deploy-cloudrun.sh
 ```

@@ -1,7 +1,7 @@
-GCP_PROJECT_NAME=nownews-terraform
+# GCP_PROJECT_NAME={GCP_PROJECT_NAME}
+# APP_VERSION=1.8
 AR_PROJECT_NAME=nodejs-dev-template
-PROJECT_NAME=nodejs-dev-template
-APP_VERSION=1.8
+PROJECT_NAME=nodejs-dev-fn-template
 CLOUDRUN_SERVICE=nodejs-dev-template-service
 
 # gcloud auth activate-service-account --key-file $PROJECT_NAME.json
@@ -23,4 +23,4 @@ gcloud run deploy $CLOUDRUN_SERVICE \
     --concurrency=1 \
 
 
-# gcloud run services delete my-service5 --platform=managed --region=asia-east1
+# gcloud run services delete $CLOUDRUN_SERVICE --platform=managed --region=asia-east1
