@@ -1,10 +1,11 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
 # GCP_PROJECT_NAME={GCP_PROJECT_NAME}
 # APP_VERSION=1.8
 AR_PROJECT_NAME=nodejs-dev-template
 PROJECT_NAME=nodejs-dev-fn-template
 CLOUDRUN_SERVICE=nodejs-dev-template-service
 
-# gcloud auth activate-service-account --key-file $PROJECT_NAME.json
 gcloud config set project $GCP_PROJECT_NAME
 gcloud auth configure-docker $AR_TARGET
 gcloud auth configure-docker --quiet

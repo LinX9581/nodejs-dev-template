@@ -7,6 +7,10 @@ on:
       - master
   workflow_dispatch:
 
+permissions:
+  contents: read
+  id-token: write
+
 env:
   PROJECT_NAME: nodejs-dev-template
 
@@ -33,16 +37,11 @@ jobs:
 
     - name: Get package version
       id: package-version
+      shell: bash
       run: |
-        VERSION=$(node -p "require('./package.json').version")
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
-        echo "Package version: $VERSION"
-
-    - name: Verify gcloud authentication
-      run: |
-        echo "Verifying gcloud authentication..."
-        gcloud auth list --format="value(account)" | head -1 | sed 's/.*@/***@/'
-        echo "Project configured successfully"
+        set -euo pipefail
+        VERSION=$(node -e "const v=require('./package.json').version||''; if(!/^[0-9]+\.[0-9]+\.[0-9]+([\-+][A-Za-z0-9\.\-]+)?$/.test(v)){process.exit(1)}; console.log(v)")
+        echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
 
     - name: Deploy to Cloud Run
       run: sh ./deploy-cloudrun.sh
