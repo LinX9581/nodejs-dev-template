@@ -1,9 +1,13 @@
+// import "./tracing.js";
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
 import indexRouter from './route/indexRouter.js';
 
 const app = express();
+
+// 信任 proxy（GKE Load Balancer / Ingress），讓 req.ip 能正確解析 X-Forwarded-For 取得真實 IP
+app.set('trust proxy', true);
 
 app.use(cors());
 app.use(express.json({ limit: '1mb' }));

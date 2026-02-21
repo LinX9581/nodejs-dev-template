@@ -32,7 +32,9 @@ export function logUserAccess(action) {
       hour12: false
     });
     
-    const ip = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for'] || 'Unknown';
+    // x-forwarded-for 可能是逗號分隔的多個 IP，第一個是真實客戶端 IP
+    const forwarded = req.headers['x-forwarded-for'];
+    const ip = (forwarded ? forwarded.split(',')[0].trim() : null) || req.ip || req.connection?.remoteAddress || 'Unknown';
     const method = req.method;
     const url = req.originalUrl || req.url;
     
@@ -80,7 +82,8 @@ export function logError(error, req) {
     hour12: false
   });
   
-  const ip = req.ip || req.connection.remoteAddress || 'Unknown';
+  const forwarded = req.headers['x-forwarded-for'];
+  const ip = (forwarded ? forwarded.split(',')[0].trim() : null) || req.ip || req.connection?.remoteAddress || 'Unknown';
   const method = req.method;
   const url = req.originalUrl || req.url;
   

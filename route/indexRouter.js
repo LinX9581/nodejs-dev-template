@@ -97,7 +97,7 @@ router.post("/api/popular-repos", logUserAccess("熱門專案數據查詢"), asy
 );
 
 // 健康檢查 (支援 /healthz 和 /pod-health 兩個端點)
-router.get(["/healthz", "/pod-health"], logUserAccess("健康檢查"), asyncHandler(async (req, res) => {
+router.get(["/healthz", "/pod-health"], asyncHandler(async (req, res) => {
   res.json({ status: "ok" });
 })
 );
