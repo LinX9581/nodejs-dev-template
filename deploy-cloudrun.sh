@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 GCP_PROJECT_NAME=nownews-terraform
-APP_VERSION=1.0.2
+APP_VERSION=2.0.4
 AR_PROJECT_NAME=nodejs-dev-template
 PROJECT_NAME=nodejs-dev-fn-template
 CLOUDRUN_SERVICE=nodejs-dev-template-service
