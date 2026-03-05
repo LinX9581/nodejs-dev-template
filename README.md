@@ -41,4 +41,16 @@ GCP_PROJECT
 PUSH_STATUS_WEBHOOK_URL  
   
 是自建 Runner
-所以 Runner 本身要有 GAR 和 Cloud Run 寫入權限  
+所以 Runner 本身要有 GAR 和 Cloud Run 寫入權限
+
+### Stress Route
+- 頁面: `/stress`
+- 後端工作端點: `/stress/backend/work`
+- fanout API: `POST /stress/api/fanout`
+
+建議部署方式:
+- 前端 app 網址: `https://nodejs.linx.bar`
+- 後端 app 網址: `https://nodejs-bn-linx.bar`
+- 前端 app 設定 `STRESS_BACKEND_BASE_URL=https://nodejs-bn-linx.bar`
+
+這組路由目前不依賴 DB/Redis，主要用來模擬高併發下的 API fanout 與下游呼叫壓力。

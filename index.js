@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
 import indexRouter from './route/indexRouter.js';
+import stressRouter from './route/stressRouter.js';
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.set("views", "views/");
 app.set("view engine", "ejs");
 
 app.use('/', indexRouter);
+app.use('/', stressRouter);
 
 const host = '0.0.0.0';
 const port = process.env.PORT || 3009;
