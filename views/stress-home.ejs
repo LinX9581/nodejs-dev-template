@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+  <div class="container py-5">
+    <h1 class="h3 mb-3"><%= title %></h1>
+    <p class="text-muted mb-4">後端網址: <code><%= backendBaseUrl || "未設定" %></code></p>
+
+    <div class="d-flex gap-2">
+      <a class="btn btn-primary" href="/stress/pure">純前端頁面</a>
+      <a class="btn btn-outline-primary" href="/stress/call-backend">前端呼叫後端 API</a>
+      <a class="btn btn-outline-secondary" href="/">回首頁</a>
+    </div>
+  </div>
+</body>
+</html>

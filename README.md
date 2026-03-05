@@ -44,13 +44,14 @@ PUSH_STATUS_WEBHOOK_URL
 所以 Runner 本身要有 GAR 和 Cloud Run 寫入權限
 
 ### Stress Route
-- 頁面: `/stress`
+- 壓測工具頁: `/stress`
+- 純前端頁: `/stress/pure`
+- 前端呼叫後端 API 頁: `/stress/call-backend`
 - 後端工作端點: `/stress/backend/work`
-- fanout API: `POST /stress/api/fanout`
+- Prometheus metrics: `/metrics`
 
 建議部署方式:
-- 前端 app 網址: `https://nodejs.linx.bar`
 - 後端 app 網址: `https://nodejs-bn-linx.bar`
-- 前端 app 設定 `STRESS_BACKEND_BASE_URL=https://nodejs-bn-linx.bar`
 
-這組路由目前不依賴 DB/Redis，主要用來模擬高併發下的 API fanout 與下游呼叫壓力。
+壓測請直接用 k6 打 `/stress/backend/work`，壓測指標請看 `/metrics` 或 Grafana。前端頁面只保留最小化展示。
+目前不依賴 DB/Redis，後續可再擴充。
