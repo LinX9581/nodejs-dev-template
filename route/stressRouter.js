@@ -78,6 +78,63 @@ function agentStats(agent) {
   };
 }
 
+function renderPrometheusMetrics() {
+  const memoryUsage = process.memoryUsage();
+  const httpStats = agentStats(upstreamHttpAgent);
+  const httpsStats = agentStats(upstreamHttpsAgent);
+  const hostname = (process.env.HOSTNAME || "local").replace(/"/g, '\\"');
+
+  const lines = [
+    "# HELP app_stress_fanout_in_flight Current in-flight fanout requests.",
+    "# TYPE app_stress_fanout_in_flight gauge",
+    `app_stress_fanout_in_flight{hostname="${hostname}"} ${runtimeCounters.fanoutInFlight}`,
+    "# HELP app_stress_upstream_in_flight Current in-flight upstream requests.",
+    "# TYPE app_stress_upstream_in_flight gauge",
+    `app_stress_upstream_in_flight{hostname="${hostname}"} ${runtimeCounters.upstreamInFlight}`,
+    "# HELP app_stress_total_fanout_requests Total fanout requests served.",
+    "# TYPE app_stress_total_fanout_requests counter",
+    `app_stress_total_fanout_requests{hostname="${hostname}"} ${runtimeCounters.totalFanoutRequests}`,
+    "# HELP app_stress_total_upstream_requests Total upstream requests sent.",
+    "# TYPE app_stress_total_upstream_requests counter",
+    `app_stress_total_upstream_requests{hostname="${hostname}"} ${runtimeCounters.totalUpstreamRequests}`,
+    "# HELP app_stress_total_upstream_failures Total upstream failures.",
+    "# TYPE app_stress_total_upstream_failures counter",
+    `app_stress_total_upstream_failures{hostname="${hostname}"} ${runtimeCounters.totalUpstreamFailures}`,
+    "# HELP app_stress_http_agent_active_sockets Active HTTP upstream sockets.",
+    "# TYPE app_stress_http_agent_active_sockets gauge",
+    `app_stress_http_agent_active_sockets{hostname="${hostname}"} ${httpStats.activeSockets}`,
+    "# HELP app_stress_http_agent_idle_sockets Idle HTTP upstream sockets.",
+    "# TYPE app_stress_http_agent_idle_sockets gauge",
+    `app_stress_http_agent_idle_sockets{hostname="${hostname}"} ${httpStats.idleSockets}`,
+    "# HELP app_stress_http_agent_queued_requests Queued HTTP upstream requests.",
+    "# TYPE app_stress_http_agent_queued_requests gauge",
+    `app_stress_http_agent_queued_requests{hostname="${hostname}"} ${httpStats.queuedRequests}`,
+    "# HELP app_stress_https_agent_active_sockets Active HTTPS upstream sockets.",
+    "# TYPE app_stress_https_agent_active_sockets gauge",
+    `app_stress_https_agent_active_sockets{hostname="${hostname}"} ${httpsStats.activeSockets}`,
+    "# HELP app_stress_https_agent_idle_sockets Idle HTTPS upstream sockets.",
+    "# TYPE app_stress_https_agent_idle_sockets gauge",
+    `app_stress_https_agent_idle_sockets{hostname="${hostname}"} ${httpsStats.idleSockets}`,
+    "# HELP app_stress_https_agent_queued_requests Queued HTTPS upstream requests.",
+    "# TYPE app_stress_https_agent_queued_requests gauge",
+    `app_stress_https_agent_queued_requests{hostname="${hostname}"} ${httpsStats.queuedRequests}`,
+    "# HELP app_stress_event_loop_delay_p95_milliseconds Event loop delay p95 in milliseconds.",
+    "# TYPE app_stress_event_loop_delay_p95_milliseconds gauge",
+    `app_stress_event_loop_delay_p95_milliseconds{hostname="${hostname}"} ${toMs(eventLoopHistogram.percentile(95))}`,
+    "# HELP app_stress_event_loop_delay_max_milliseconds Event loop delay max in milliseconds.",
+    "# TYPE app_stress_event_loop_delay_max_milliseconds gauge",
+    `app_stress_event_loop_delay_max_milliseconds{hostname="${hostname}"} ${toMs(eventLoopHistogram.max)}`,
+    "# HELP app_process_resident_memory_bytes Resident memory size in bytes.",
+    "# TYPE app_process_resident_memory_bytes gauge",
+    `app_process_resident_memory_bytes{hostname="${hostname}"} ${memoryUsage.rss}`,
+    "# HELP app_process_heap_used_bytes V8 heap used in bytes.",
+    "# TYPE app_process_heap_used_bytes gauge",
+    `app_process_heap_used_bytes{hostname="${hostname}"} ${memoryUsage.heapUsed}`
+  ];
+
+  return `${lines.join("\n")}\n`;
+}
+
 async function runWorkerTask(waitMs, payloadKb, runId, sequence) {
   const startedAt = performance.now();
   const payload = "x".repeat(payloadKb * 1024) + `:${runId}:${sequence}:${Date.now()}`;
@@ -290,6 +347,11 @@ router.get("/stress/api/metrics", asyncHandler(async (req, res) => {
     },
     recentErrors
   });
+}));
+
+router.get("/metrics", asyncHandler(async (req, res) => {
+  res.set("Content-Type", "text/plain; version=0.0.4; charset=utf-8");
+  res.send(renderPrometheusMetrics());
 }));
 
 export default router;
