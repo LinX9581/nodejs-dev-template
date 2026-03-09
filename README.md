@@ -45,13 +45,10 @@ PUSH_STATUS_WEBHOOK_URL
 
 ### Stress Route
 - 壓測工具頁: `/stress`
-- 純前端頁: `/stress/pure`
-- 前端呼叫後端 API 頁: `/stress/call-backend`
 - 後端工作端點: `/stress/backend/work`
-- Prometheus metrics: `/metrics`
 
 建議部署方式:
 - 後端 app 網址: `https://nodejs-bn-linx.bar`
 
-壓測請直接用 k6 打 `/stress/backend/work`，壓測指標請看 `/metrics` 或 Grafana。前端頁面只保留最小化展示。
+壓測請直接用 k6 打 `/stress/backend/work`，前端流程測試則走 `/stress` 與 `/stress/api/call-backend`。
 目前不依賴 DB/Redis，後續可再擴充。

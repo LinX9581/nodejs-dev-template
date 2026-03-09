@@ -1,18 +1,18 @@
 import http from "k6/http";
 import { check } from "k6";
 
-const BN_BASE = "https://nodejs-bn.linx.bar";
+const BN_BASE = "http://nodejs-bn.linx.bar";
 
 export const options = {
   scenarios: {
     bn_api_rps: {
       executor: "constant-arrival-rate",
       exec: "testBnApiRps",
-      rate: 300,
+      rate: 3000,
       timeUnit: "1s",
-      duration: "7m",
+      duration: "20m",
       preAllocatedVUs: 100,
-      maxVUs: 1200,
+      maxVUs: 10000,
     },
   },
   thresholds: {
@@ -34,7 +34,7 @@ function safeJson(res) {
 export function testBnApiRps() {
   const res = http.get(`${BN_BASE}/stress/backend/work?waitMs=5&payloadKb=16`, {
     tags: { scenario: "bn_api_rps" },
-    timeout: "10s",
+    timeout: "15s",
   });
 
   const body = safeJson(res);

@@ -11,11 +11,47 @@
     <h1 class="h3 mb-3"><%= title %></h1>
     <p class="text-muted mb-4">後端網址: <code><%= backendBaseUrl || "未設定" %></code></p>
 
-    <div class="d-flex gap-2">
-      <a class="btn btn-primary" href="/stress/pure">純前端頁面</a>
-      <a class="btn btn-outline-primary" href="/stress/call-backend">前端呼叫後端 API</a>
-      <a class="btn btn-outline-secondary" href="/">回首頁</a>
+    <div class="mb-3">
+      <button id="runBtn" class="btn btn-primary" type="button">重新呼叫後端 API</button>
+      <a class="btn btn-outline-secondary ms-2" href="/">回首頁</a>
     </div>
+
+    <pre id="result" class="bg-dark text-light rounded p-3">載入中...</pre>
   </div>
+
+  <script>
+    const runBtn = document.getElementById("runBtn");
+    const result = document.getElementById("result");
+
+    async function callBackend() {
+      runBtn.disabled = true;
+      result.textContent = "載入中...";
+
+      try {
+        const response = await fetch("/stress/api/call-backend", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            waitMs: 5,
+            payloadKb: 16,
+            timeoutMs: 10000
+          })
+        });
+
+        const data = await response.json();
+        result.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        result.textContent = JSON.stringify({
+          status: "error",
+          message: error.message
+        }, null, 2);
+      } finally {
+        runBtn.disabled = false;
+      }
+    }
+
+    runBtn.addEventListener("click", callBackend);
+    callBackend();
+  </script>
 </body>
 </html>

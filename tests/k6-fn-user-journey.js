@@ -10,9 +10,9 @@ export const options = {
       exec: "testFnUserJourney",
       startVUs: 20,
       stages: [
-        { duration: "2m", target: 300 },
-        { duration: "3m", target: 600 },
-        { duration: "2m", target: 200 },
+        { duration: "1m", target: 300 },
+        // { duration: "2m", target: 600 },
+        // { duration: "2m", target: 200 },
       ],
       gracefulRampDown: "30s",
     },
@@ -23,8 +23,6 @@ export const options = {
     "http_req_duration{scenario:fn_user_journey}": ["p(95)<2000"],
   },
 };
-
-let pageLoaded = false;
 
 function safeJson(res) {
   if (!res || !res.body) return null;
@@ -40,19 +38,17 @@ function randomThinkTime() {
 }
 
 export function testFnUserJourney() {
-  if (!pageLoaded) {
-    const pageRes = http.get(`${FN_BASE}/stress/call-backend`, {
-      tags: { scenario: "fn_user_journey", step: "page_load" },
-      timeout: "15s",
-    });
+  const pageRes = http.get(`${FN_BASE}/stress`, {
+    tags: { scenario: "fn_user_journey", step: "page_load" },
+    timeout: "15s",
+  });
 
-    check(pageRes, {
-      "fn page status 200": (r) => r.status === 200,
-    });
+  check(pageRes, {
+    "fn page status 200": (r) => r.status === 200,
+    "fn page has auto call": (r) => r.body && r.body.includes("/stress/api/call-backend"),
+  });
 
-    pageLoaded = true;
-    sleep(0.2);
-  }
+  sleep(0.2);
 
   const payload = JSON.stringify({
     waitMs: 5,
